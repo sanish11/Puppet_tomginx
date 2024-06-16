@@ -1,3 +1,4 @@
+#Puppet Domain Specific Language(DSL)
 # Define installation directory
 $install_dir = 'C:\test'
 $tomcat_version = '9.0.81'
@@ -7,6 +8,9 @@ $nginx_version = '1.21.6'
 $nginx_zip_url = "https://nginx.org/download/nginx-${nginx_version}.zip"
 $nginx_zip_path = "${install_dir}\\nginx.zip"
 $nginx_extracted_path = "${install_dir}\\nginx-${nginx_version}"
+$mssql_installer_url = 'https://go.microsoft.com/fwlink/?linkid=866658'
+$mssql_installer_path = "${install_dir}\\SQL2019-SSEI-Dev.exe"
+$mssql_install_path = "${install_dir}\\MSSQL"
 
 # Ensure the installation directory exists
 file { $install_dir:
@@ -33,6 +37,13 @@ exec { 'extract_nginx':
   command => "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -command \"Expand-Archive -Path '${nginx_zip_path}' -DestinationPath '${install_dir}'\"",
   require => Exec['download_nginx'],
   creates => $nginx_extracted_path,
+}
+# Download SQL Server Installer
+exec { 'download_mssql_installer':
+  command => "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -command \"Invoke-WebRequest -Uri '${mssql_installer_url}' -OutFile '${mssql_installer_path}'\"",
+  cwd     => $install_dir,
+  creates => $mssql_installer_path,
+  require => File[$install_dir],
 }
 
 
